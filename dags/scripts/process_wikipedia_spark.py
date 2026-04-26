@@ -1,6 +1,8 @@
 from pyspark.sql import SparkSession
 from pyspark.sql import functions as F
 from clickhouse_driver import Client
+import os
+import glob
 
 def run_spark_analytics():
     spark = SparkSession.builder \
@@ -54,6 +56,15 @@ def run_spark_analytics():
     data_tuples = [tuple(x) for x in final_results.to_numpy()]
     if data_tuples:
         client.execute('INSERT INTO analytics.wikipedia_trending VALUES', data_tuples)
+    
+    # Menghapus file .parquet yang sudah diproses agar tidak menumpuk
+    print("Membersihkan file Parquet lama dari Data Lake...")
+    files = glob.glob('/opt/airflow/data_lake/wikipedia/*.parquet')
+    for f in files:
+        try:
+            os.remove(f)
+        except OSError as e:
+            print(f"Error: {f} : {e.strerror}")
     
     print("✅ Pipeline Selesai!")
 

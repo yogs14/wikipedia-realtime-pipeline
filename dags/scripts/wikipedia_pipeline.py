@@ -12,7 +12,7 @@ default_args = {
 with DAG(
     'wikipedia_realtime_stream',
     default_args=default_args,
-    schedule_interval='*/2 * * * *', # Berjalan setiap 2 menit
+    schedule_interval='*/10 * * * *', # Berjalan setiap 2 menit
     catchup=False,
     max_active_runs=1,
     description='Micro-batching Wikipedia API -> Spark -> ClickHouse'
