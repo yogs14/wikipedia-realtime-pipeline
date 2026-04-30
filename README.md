@@ -31,7 +31,6 @@ Wikipedia API
 - **Volume Bytes** — total karakter ditambah/dihapus per artikel
 - **Bot vs Human Edits** — seberapa dominan bot dalam merawat artikel hari ini
 
----
 
 ## 🛠️ Tech Stack
 
@@ -44,7 +43,6 @@ Wikipedia API
 | Infrastructure | Docker & Docker Compose |
 | Language | Python 3.11 |
 
----
 
 ## 📂 Struktur Proyek
 
@@ -68,20 +66,25 @@ wikipedia-realtime-pipeline/
 
 ### Pastikan
 - [Docker Desktop](https://docs.docker.com/get-docker/) sudah terinstal
+- menggunakan git bash
 
 
 ### Step 1 — Buat Struktur Folder
+
+Membuat folder utama 
 
 ```bash
 mkdir wikipedia-realtime-pipeline
 cd wikipedia-realtime-pipeline
 ```
 
-
+Membuat folder untuk data mentah
 
 ```bash
 mkdir -p dags/scripts data_lake
 ```
+
+Membuat file kosong untuk nanti
 
 ```bash
 touch docker-compose.yml Dockerfile requirements.txt .gitignore
@@ -90,39 +93,43 @@ touch dags/scripts/fetch_wikipedia.py
 touch dags/scripts/process_spark.py
 ```
 
-> `dags/` → dibaca otomatis oleh Airflow  
-> `dags/scripts/` → logika utama 
+> `dags/` → dibaca otomatis oleh Airflow  untuk mendefinisikan jadwal dan alur kerja 
+> `dags/scripts/` → logika utama kode
 > `data_lake/` → penyimpanan sementara `.parquet` hasil ingest
 
----
 
 ### Step 2 — Isi File Konfigurasi & Kode
 
-Isi masing-masing file dengan script dari repo ini:
+Isi masing-masing file dengan mengcopas code dari repo ini:
 
 | File | Fungsi |
 |------|--------|
 | `requirements.txt` | Library Python yang diinstal otomatis (`requests`, `pandas`, dll) |
-| `Dockerfile` | Instruksi merakit container Airflow + dependensi custom |
-| `docker-compose.yml` | Urutan nyala service: Postgres → Airflow → ClickHouse |
+| `Dockerfile` | Instruksi langkah-langkah merakit container Airflow + dependensi custom |
+| `docker-compose.yml` | Mengatur beberapa aplikasi sekaligus agar bisa bekerja dalam satu lingkungan. Urutan nyala service: Postgres → Airflow → ClickHouse |
 | `fetch_wikipedia.py` | Tarik 500 data terbaru dari API, simpan sebagai `.parquet` |
 | `process_spark.py` | Baca `.parquet` → agregasi → load ke ClickHouse → hapus file mentah |
 | `wikipedia_pipeline.py` | DAG Airflow: jadwal & urutan task |
 
-> ⚠️ **Perhatikan dua hal ini sebelum lanjut:**  
+> ⚠️ **Perhatikan**  
 > • Di `fetch_wikipedia.py` — ganti bagian `email` dengan email kalian sendiri
 
----
 
 ### Step 3 — Jalankan Docker
+
+Build image. Jangan lupa buka dahulu docker desktop.
 
 ```bash
 docker-compose build
 ```
 
+Instalasi database airflow
+
 ```bash
 docker-compose up airflow-init
 ```
+
+Jalankan seluruh pipeline
 
 ```bash
 docker-compose up -d
@@ -130,7 +137,6 @@ docker-compose up -d
 
 > Tunggu 1–2 menit lalu buka **http://localhost:8080**
 
----
 
 ### Step 4 — Aktifkan Pipeline di Airflow
 
@@ -150,13 +156,16 @@ docker-compose up -d
 [Menunggu 10 menit berikutnya...]
 ```
 
----
 
 ### Step 5 — Validasi Data di ClickHouse
+
+Masuk ke database ClickHouse
 
 ```bash
 docker exec -it wikipedia-realtime-pipeline-clickhouse-server-1 clickhouse-client --user admin --password rahasia
 ```
+
+Masuki database dan jalankan query untuk melihat data
 
 ```sql
 SHOW DATABASES;
@@ -167,9 +176,13 @@ DESCRIBE analytics.wikipedia_trending;
 SELECT COUNT(*) FROM analytics.wikipedia_trending;
 ```
 
+Melihat 10 artikel wikipedia yang paling banyak diedit dalam siklus tersebut.
+
 ```sql
 SELECT * FROM wikipedia_trending LIMIT 10;
 ```
+
+Artikel mana saja yang saat ini sedang dirawat atau diserang oleh bot otomatis
 
 ```sql
 SELECT title, total_edits, bot_edits
@@ -178,16 +191,17 @@ WHERE bot_edits > 0
 ORDER BY bot_edits DESC;
 ```
 
+Keluar dari ClickHouse
+
 ```sql
 exit
 ```
 
----
 
 ### Step 6 — Visualisasi di Metabase
 
 1. Buka **http://localhost:3000**, isi data diri (boleh dummy)
-2. Di halaman **Add your data**, isi koneksi berikut:
+2. Di halaman **Add your data**, pilih ClickHouse lalu isi koneksi berikut:
 
 | Field | Value |
 |-------|-------|
@@ -202,7 +216,6 @@ exit
 3. Klik **+ New → Question** → pilih **wikipedia_trending** → klik **Visualize**
 4. Pilih format grafik (misal: Bar Chart)
 
----
 
 ### Step 7 — Matikan Infrastruktur
 
@@ -210,9 +223,6 @@ exit
 docker-compose down
 ```
 
-> Mematikan semua container dengan aman dan membebaskan RAM
-
----
 
 ## 🔐 Layanan
 
