@@ -68,6 +68,7 @@ wikipedia-realtime-pipeline/
 - [Docker Desktop](https://docs.docker.com/get-docker/) sudah terinstal
 - menggunakan git bash
 
+---
 
 ### Step 1 — Buat Struktur Folder
 
@@ -97,6 +98,7 @@ touch dags/scripts/process_spark.py
 > `dags/scripts/` → logika utama kode
 > `data_lake/` → penyimpanan sementara `.parquet` hasil ingest
 
+---
 
 ### Step 2 — Isi File Konfigurasi & Kode
 
@@ -114,6 +116,7 @@ Isi masing-masing file dengan mengcopas code dari repo ini:
 > ⚠️ **Perhatikan**  
 > • Di `fetch_wikipedia.py` — ganti bagian `email` dengan email kalian sendiri
 
+---
 
 ### Step 3 — Jalankan Docker
 
@@ -137,6 +140,7 @@ docker-compose up -d
 
 > Tunggu 1–2 menit lalu buka **http://localhost:8080**
 
+---
 
 ### Step 4 — Aktifkan Pipeline di Airflow
 
@@ -156,6 +160,7 @@ docker-compose up -d
 [Menunggu 10 menit berikutnya...]
 ```
 
+---
 
 ### Step 5 — Validasi Data di ClickHouse
 
@@ -197,6 +202,7 @@ Keluar dari ClickHouse
 exit
 ```
 
+---
 
 ### Step 6 — Visualisasi di Metabase
 
@@ -216,6 +222,7 @@ exit
 3. Klik **+ New → Question** → pilih **wikipedia_trending** → klik **Visualize**
 4. Pilih format grafik (misal: Bar Chart)
 
+---
 
 ### Step 7 — Matikan Infrastruktur
 
@@ -223,6 +230,7 @@ exit
 docker-compose down
 ```
 
+---
 
 ## 🔐 Layanan
 
