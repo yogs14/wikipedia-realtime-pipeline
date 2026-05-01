@@ -1,6 +1,6 @@
 # 🌐 Wikipedia Real-Time Data Pipeline
 
-> End-to-End Modern Data Stack Implementation · Materi Pendamping Pelatihan Big Data
+> Materi Pendamping Pelatihan Big Data Lab MCI 2026 · End-to-End Modern Data Stack Implementation
 
 Proyek ini mengekstrak aliran data *real-time* dari **Wikipedia API**, memprosesnya dengan **Apache Spark**, mengorkestrasinya via **Apache Airflow**, menyimpannya ke **ClickHouse**, dan memvisualisasikannya di **Metabase** dan dikemas dalam satu perintah Docker.
 
@@ -159,6 +159,24 @@ docker-compose up -d
     ↓
 [Menunggu 10 menit berikutnya...]
 ```
+
+Gambar berikut menunjukkan bahwa di dalam folder data_lake/wikipedia/ sudah muncul sebuah file bernama edits_20260430_040...parquet. Ini adalah bukti fisik bahwa data Wikipedia benar-benar berhasil disedot oleh Python dan tersimpan di laptop. Nantinya akan terhapus otomatis dan dimasukkan ke dalam ClickHouse.
+
+<img width="1680" height="729" alt="Screenshot 2026-04-30 110014" src="https://github.com/user-attachments/assets/882321b1-4cd0-4c97-8832-01144ba016ac" />
+
+
+Gambar berikut menampilkan tab Graph, yang merupakan representasi visual dari logika urutan code. Terdapat dua kotak yang saling terhubung dengan garis biru. Kotak kiri adalah tugas menyedot data (fetch_recent_changes) dan kotak kanan adalah tugas mengolah data dengan Spark (process_heavy_hitters_spark). Di dalam kedua kotak tersebut terdapat indikator kotak kecil berwarna hijau bertuliskan success. Ini membuktikan bahwa dependency (ketergantungan) dibuat berjalan lancar: Tugas 1 berhasil mencari data, lalu estafet diserahkan ke Tugas 2, dan Tugas 2 berhasil mengolah serta memasukkannya ke ClickHouse.
+
+<img width="806" height="290" alt="Screenshot 2026-04-30 105100" src="https://github.com/user-attachments/assets/10acb628-cd54-4e21-9240-f15b19da98b8" />
+
+Gambar berikut menujukkan bahwa istem melaporkan ringkasan kinerja. Pada bagian "DAG Runs Summary", tertulis angka 6 pada kolom Total success. Dapat diartikan sistem otomatis pencari data (scheduler) sudah terbangun dan menjalankan seluruh tugasnya dari awal sampai akhir sebanyak 6 kali putaran, dan semuanya berhasil tanpa ada error sama sekali. Di panel sebelah kiri (grid view), terlihat 6 tumpukan balok hijau tebal yang merepresentasikan 6 siklus kesuksesan tersebut. Rata-rata waktu yang dibutuhkan untuk menyelesaikan satu siklus penuh hanya 13 detik.
+
+<img width="1487" height="627" alt="Screenshot 2026-04-30 111845" src="https://github.com/user-attachments/assets/727c6909-b759-4836-b08e-670f336ddc8d" />
+
+Gambar berikut terlihat log dari fetch_recent_changes. Terlihat pesan yang dicetak: "INFO - Membuka keran data: API Wikipedia (Recent Changes)..." lalu terdapat "INFO - ✅ Sukses menyimpan 500 baris ke /opt/***/data_lake/wikipedia/edits_20260430_034420.parquet". Di baris bawah, tertulis Command exited with return code 0. Maka eksekusi berhasil 100% terjalankan.
+
+<img width="1919" height="704" alt="Screenshot 2026-04-30 105204" src="https://github.com/user-attachments/assets/3433d50f-661b-4bd2-b6f7-b6cd4cf1b26e" />
+
 
 ---
 
