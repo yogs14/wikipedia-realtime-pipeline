@@ -50,8 +50,8 @@ Wikipedia API
 wikipedia-realtime-pipeline/
 ├── dags/
 │   ├── scripts/
-│   │   ├── fetch_wikipedia.py       #Ekstraksi API → Data Lake
-│   │   └── process_spark.py         #PySpark: agregasi & load ke ClickHouse
+│   │   ├── fetch_wikipedia_stream.py       #Ekstraksi API → Data Lake
+│   │   └── process_wikipedia_spark.py         #PySpark: agregasi & load ke ClickHouse
 │   └── wikipedia_pipeline.py        #Definisi DAG Airflow
 ├── data_lake/                       #Penyimpanan sementara file .parquet
 ├── docker-compose.yml               #Konfigurasi seluruh service
@@ -90,8 +90,8 @@ Membuat file kosong untuk nanti
 ```bash
 touch docker-compose.yml Dockerfile requirements.txt .gitignore
 touch dags/wikipedia_pipeline.py
-touch dags/scripts/fetch_wikipedia.py
-touch dags/scripts/process_spark.py
+touch dags/scripts/fetch_wikipedia_stream.py
+touch dags/scripts/process_wikipedia_spark.py
 ```
 
 > `dags/` → dibaca otomatis oleh Airflow  untuk mendefinisikan jadwal dan alur kerja 
@@ -109,12 +109,12 @@ Isi masing-masing file dengan mengcopas code dari repo ini:
 | `requirements.txt` | Library Python yang diinstal otomatis (`requests`, `pandas`, dll) |
 | `Dockerfile` | Instruksi langkah-langkah merakit container Airflow + dependensi custom |
 | `docker-compose.yml` | Mengatur beberapa aplikasi sekaligus agar bisa bekerja dalam satu lingkungan. Urutan nyala service: Postgres → Airflow → ClickHouse |
-| `fetch_wikipedia.py` | Tarik 500 data terbaru dari API, simpan sebagai `.parquet` |
-| `process_spark.py` | Baca `.parquet` → agregasi → load ke ClickHouse → hapus file mentah |
+| `fetch_wikipedia_stream.py` | Tarik 500 data terbaru dari API, simpan sebagai `.parquet` |
+| `process_wikipedia_spark.py` | Baca `.parquet` → agregasi → load ke ClickHouse → hapus file mentah |
 | `wikipedia_pipeline.py` | DAG Airflow: jadwal & urutan task |
 
 > ⚠️ **Perhatikan**  
-> • Di `fetch_wikipedia.py` — ganti bagian `email` dengan email kalian sendiri
+> • Di `fetch_wikipedia_stream.py` — ganti bagian `email` dengan email kalian sendiri
 
 ---
 
